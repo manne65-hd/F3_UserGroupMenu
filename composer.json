@@ -1,0 +1,22 @@
+{
+    "name": "manne65hd/f3_usergroupmenu",
+    "description": "UserManagemment including groups and a menu for F3(FatFreeFramework)",
+    "type": "library",
+    "require": {
+        "bcosca/fatfree-core": "^3.8",
+        "ikkez/f3-cortex": "^1.7",
+        "xfra35/f3-access": "^1.2",
+        "directorytree/ldaprecord": "^3.0"
+    },
+    "license": "GPL-3.0",
+    "autoload": {
+        "classmap" : [ "helpers", "models" ]
+      },
+    "authors": [
+        {
+            "name": "Manfred Hoffmann",
+            "email": "oss@manne65-hd.de"
+        }
+    ],
+    "minimum-stability": "dev"
+}
