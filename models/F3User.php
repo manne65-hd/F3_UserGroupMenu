@@ -21,6 +21,8 @@ class F3User extends \DB\Cortex {
             } elseif ($this->auth_type === self::AUTH_TYPE_LDAP) {
                 // ... but user is from LDAP, so let's check auth via LDAP
                 self::connectLdapServer($f3->get('ldap.server_type'));
+                // for now it's OK to assume, that we will find a matching username in the LDAP ...
+                // but later we will have to check if that's really true and also check, if the user is still active!
                 $ldap_user_info = $this->ldapServer->ldapGetUserInfo($username);
                 $f3->Dumper->collect('$ldap_user_info',$ldap_user_info);
                 return $this->ldapServer->ldapAuth($ldap_user_info['user']['distinguishedname'], $password);
@@ -29,9 +31,29 @@ class F3User extends \DB\Cortex {
             // Username was NOT found ... check LDAP ??
             self::connectLdapServer($f3->get('ldap.server_type'));
             $ldap_user_info = $this->ldapServer->ldapGetUserInfo($username);
-            $f3->Dumper->collect('$ldap_user_info',$ldap_user_info);
-            return $this->ldapServer->ldapAuth($ldap_user_info['user']['distinguishedname'], $password);
+            if ($ldap_user_info) {
+                // user exists ... let's save to the local database!
+                self::saveUser($ldap_user_info['user']);
+
+                $f3->Dumper->collect('$ldap_user_info',$ldap_user_info);
+                return $this->ldapServer->ldapAuth($ldap_user_info['user']['distinguishedname'], $password);
+            } else {
+
+            }
         }
+    }
+
+    public function saveUser($userdata){
+        echo '<pre>';
+        print_r($userdata);
+        echo '</pre>';
+        $this->username = $userdata['username'];
+        $this->auth_type = self::AUTH_TYPE_LDAP;
+        $this->ldap_unique_id = $userdata['guid'];
+        $this->firstname = $userdata['firstname'];
+        $this->lastname = $userdata['lastname'];
+        $this->email = $userdata['email'];
+        $this->save();
     }
 
     protected function connectLdapServer($server_type){

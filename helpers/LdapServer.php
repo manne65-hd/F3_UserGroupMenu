@@ -13,6 +13,7 @@ abstract class LdapServer {
     const TYPE_OTHER = 'Other';
 
     protected $ldap_server; // The LDAP-connection-object
+    protected $ldap_groups_base; // connect to
     protected $ldap_user; // The LDAP-user-object
     protected $ldap_group; // The LDAP-group-object
 
@@ -30,6 +31,26 @@ public function __construct(){
     $this->ldap_user = new \LdapRecord\Models\ActiveDirectory\User();
     $this->ldap_group =  new \LdapRecord\Models\ActiveDirectory\Group();
 
+    // TEST getting groups in BASE_DN
+    //$group = $this->ldap_group::find($f3->get('ldap.groups_base_dn'));
+    
+    $groups = Group::in($f3->get('ldap.groups_base_dn'))->get();
+    
+    foreach ($groups as $cur_group) {
+        echo $cur_group->getName() . '<br>';
+    }
+    
+    
+    $schaden = group::find('CN=PM,OU=Gruppen,OU=TSE-AG,DC=tse-ag,DC=local');
+    $schadenmgt = $schaden->members()->get();
+    /*
+    echo '<h4>Mitglieder SChadensmanagement</h4>';
+    foreach ($schadenmgt as $member) {
+        echo $member->getName() . '<br>';
+    }
+    */
+
+
     return $this->ldap_server;
 }
 
@@ -38,6 +59,7 @@ public function __construct(){
     }
 
     abstract public function ldapGetUserInfo($username);
+
 
 
 }
